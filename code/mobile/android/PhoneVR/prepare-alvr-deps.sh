@@ -33,10 +33,20 @@ curl -sLS "https://github.com/nift4/cardboard/archive/refs/heads/master.zip" > d
 unzip download.zip
 rm download.zip
 
+# Only the SDK is needed: drop the sample app, and use the same AGP as PhoneVR
+# (AGP 8.0.2 crashes with ExceptionInInitializerError on current runners)
+sed -i "s/include ':sdk', ':hellocardboard-android'/include ':sdk'/" "${CARB_REPO_NAME}/settings.gradle"
+sed -i "s/com.android.tools.build:gradle:8.0.2/com.android.tools.build:gradle:8.3.1/" "${CARB_REPO_NAME}/build.gradle"
+
 # Build sdk
 pushd "${CARB_REPO_NAME}"
 ./gradlew sdk:assembleRelease -Parm64-v8a
 popd
+
+if [ ! -f "${CARB_REPO_NAME}/sdk/build/outputs/aar/sdk-release.aar" ]; then
+    echo "ERROR: Cardboard SDK build failed, sdk-release.aar not found"
+    exit 1
+fi
 
 # Prepare files
 mkdir cardboard
