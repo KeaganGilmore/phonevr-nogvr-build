@@ -23,6 +23,10 @@ cargo update
 cargo xtask prepare-deps --platform android $@
 popd
 
+# ALVR's xtask installs the latest cargo-ndk, but 4.x repurposed `-p` (was
+# platform, now package), which breaks `build-client-lib`. Pin to 3.x.
+cargo install cargo-ndk --version "^3" --locked --force
+
 rm -r cardboard
 
 # Download sdk source$
